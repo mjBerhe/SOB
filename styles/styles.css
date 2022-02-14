@@ -17,4 +17,6 @@ a {
 
 * {
   box-sizing: border-box;
+  @apply bg-gray-700;
+  @apply text-white;
 }

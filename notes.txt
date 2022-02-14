@@ -1,0 +1,9 @@
+A. Ways to incorparate a phone
+  1. Players can lock in when they have answered a question with their phone
+
+
+Types of Questions
+
+1. Normal Questions
+  - question shows on screen
+  - timer 
