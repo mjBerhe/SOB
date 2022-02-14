@@ -4,9 +4,7 @@ import { useEffect } from "react";
 
 const Home: NextPage = () => {
   useEffect((): any => {
-    const socket = io.connect(process.env.BASE_URL, {
-      path: "/api/socketio",
-    });
+    const socket = io({ path: "/api/socketio" });
 
     socket.on("connect", () => {
       console.log("socket connected!", socket.id);
