@@ -19,6 +19,18 @@ const socketHandler = (req: NextApiRequest, res: NextApiResponseServerIO) => {
     });
     // append SocketIO server to Next.js socket server response
     res.socket.server.io = io;
+
+    io.on("connection", (socket) => {
+      console.log(`${socket.id} connected`);
+
+      socket.on("test", (msg) => {
+        console.log(msg);
+      });
+
+      socket.on("disconnect", () => {
+        console.log(`disconnecting ${socket.id}`);
+      });
+    });
   }
   res.end();
 };
