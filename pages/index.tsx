@@ -1,12 +1,27 @@
 import type { NextPage } from "next";
-import { io } from "socket.io-client";
 import { useEffect, useState } from "react";
+import { useRouter } from "next/router";
+import { io } from "socket.io-client";
+
+type roomData = {
+  host: string;
+  roomName: string;
+};
 
 const socket = io({ path: "/api/socketio" });
+
 const Home: NextPage = () => {
+  const router = useRouter();
+
   useEffect((): any => {
     socket.on("connect", () => {
       console.log("socket connected!", socket.id);
+    });
+
+    socket.on("roomCreated", (roomData: roomData) => {
+      console.log(roomData);
+      const { roomName } = roomData;
+      router.push(`/${roomName}`);
     });
 
     socket.on("disconnect", () => {
@@ -14,19 +29,12 @@ const Home: NextPage = () => {
     });
 
     if (socket) return () => socket.disconnect();
-  }, [socket]);
+  }, []);
 
   const handleCreateRoom = async () => {
-    // const response = await fetch("/api/socketio", {
-    //   method: "POST",
-    //   headers: {
-    //     "Content-Type": "application/json",
-    //   },
-    //   body: JSON.stringify("created room"),
-    // });
-    // console.log("clicked");
-    socket.emit("test", {
-      message: "testinggggg",
+    socket.emit("createRoomRequest", {
+      id: socket.id,
+      message: "trying to create room",
     });
   };
 

@@ -9,6 +9,11 @@ export const config = {
   },
 };
 
+type roomRequestData = {
+  id: string;
+  message: string;
+};
+
 const socketHandler = (req: NextApiRequest, res: NextApiResponseServerIO) => {
   if (!res.socket.server.io) {
     console.log("New Socket.io server...");
@@ -23,8 +28,14 @@ const socketHandler = (req: NextApiRequest, res: NextApiResponseServerIO) => {
     io.on("connection", (socket) => {
       console.log(`${socket.id} connected`);
 
-      socket.on("test", (msg) => {
-        console.log(msg);
+      socket.on("createRoomRequest", (data: roomRequestData) => {
+        console.log(data);
+
+        socket.join(data.id);
+        socket.emit("roomCreated", {
+          host: socket.id,
+          roomName: socket.id,
+        });
       });
 
       socket.on("disconnect", () => {
