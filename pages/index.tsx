@@ -35,21 +35,33 @@ const Home: NextPage = () => {
 
   // console.log(localStorage);
 
-  const handleCreateRoom = async () => {
+  const handleCreateRoom = () => {
     socket.emit("createRoomRequest", {
       id: socket.id,
       message: "trying to create room",
     });
   };
 
+  const handleJoinRoom = () => {
+    router.push("/join");
+  };
+
   return (
     <div className="min-h-screen flex items-center justify-center">
-      <button
-        className="outline-none border border-white p-4 rounded-lg"
-        onClick={handleCreateRoom}
-      >
-        Create Room
-      </button>
+      <div className="flex space-x-4">
+        <button
+          className="outline-none border border-white p-4 rounded-lg"
+          onClick={handleCreateRoom}
+        >
+          Create Room
+        </button>
+        <button
+          className="outline-none border border-white p-4 rounded-lg"
+          onClick={handleJoinRoom}
+        >
+          Join Room
+        </button>
+      </div>
     </div>
   );
 };
