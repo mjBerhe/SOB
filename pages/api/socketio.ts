@@ -31,10 +31,12 @@ const socketHandler = (req: NextApiRequest, res: NextApiResponseServerIO) => {
       socket.on("createRoomRequest", (data: roomRequestData) => {
         console.log(data);
 
-        socket.join(data.id);
+        const roomName = data.id.slice(0, 4);
+
+        socket.join(roomName);
         socket.emit("roomCreated", {
           host: socket.id,
-          roomName: socket.id,
+          roomName: roomName,
         });
       });
 

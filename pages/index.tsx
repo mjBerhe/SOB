@@ -19,6 +19,8 @@ const Home: NextPage = () => {
     });
 
     socket.on("roomCreated", (roomData: roomData) => {
+      localStorage.setItem("hostID", roomData.host);
+
       console.log(roomData);
       const { roomName } = roomData;
       router.push(`/${roomName}`);
@@ -30,6 +32,8 @@ const Home: NextPage = () => {
 
     if (socket) return () => socket.disconnect();
   }, []);
+
+  // console.log(localStorage);
 
   const handleCreateRoom = async () => {
     socket.emit("createRoomRequest", {
