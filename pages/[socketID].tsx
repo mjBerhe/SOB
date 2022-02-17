@@ -2,6 +2,14 @@ import type { NextPage } from "next";
 import { useEffect } from "react";
 import { useRouter } from "next/router";
 import { io } from "socket.io-client";
+import dynamic from "next/dynamic";
+
+const WheelSpinner = dynamic(
+  () => {
+    return import("../components/wheelSpinner");
+  },
+  { ssr: false }
+);
 
 type socketInfo = {
   host: string;
@@ -21,7 +29,12 @@ const Room: NextPage = () => {
     }
   }, [socketID]);
 
-  return <div>Room Name: {socketID}</div>;
+  return (
+    <div>
+      <h2>Room Name: {socketID}</h2>
+      <WheelSpinner />
+    </div>
+  );
 };
 
 export default Room;
