@@ -53,7 +53,7 @@ const Room: NextPage = () => {
 
     socket.on("usersList", (data) => {
       console.log(data);
-      setUsers(data.users);
+      setUsers(data.room.users);
     });
 
     socket.on("disconnect", () => {

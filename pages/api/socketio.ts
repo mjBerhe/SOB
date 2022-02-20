@@ -3,6 +3,8 @@ import { NextApiResponseServerIO } from "../../types/NextApiResponseServerIO";
 import { Server as ServerIO } from "socket.io";
 import { Server as NetServer } from "http";
 
+import { addUser, findRoom } from "../../utils/socketio/users";
+
 export const config = {
   api: {
     bodyParser: false,
@@ -20,12 +22,12 @@ type userJoinData = {
   currentSocketID: string;
 };
 
-type room = {
+type Room = {
   name: string;
-  users: user[];
+  users: User[];
 };
 
-type user = {
+type User = {
   isHost: boolean;
   hostID?: string;
   id: string;
@@ -47,8 +49,10 @@ const socketHandler = (req: NextApiRequest, res: NextApiResponseServerIO) => {
 
     let hostID: string;
     let roomName: string;
-    const rooms: room[] = [];
-    const users: user[] = [];
+    const rooms: Room[] = [];
+    const users: User[] = [];
+
+    // *usersList EMIT MUST BE A BROADCAST?? EVERYONE ON SOCKET MUST RECIEVE SOMEHOW
 
     io.on("connection", (socket) => {
       console.log(`${socket.id} connected`);
@@ -72,29 +76,29 @@ const socketHandler = (req: NextApiRequest, res: NextApiResponseServerIO) => {
       });
 
       socket.on("hostJoin", (data: userJoinData) => {
-        // find the room in rooms and then add the user
-        // *MAKE FUNCTION FOR THIS LIKE addUser(roomName, user)
-        users.push({
+        const user: User = {
           isHost: true,
           hostID: data.hostID,
           id: data.currentSocketID,
           currentRoom: data.roomName,
-        });
+        };
+        addUser(data.roomName, user, rooms);
 
         socket.emit("usersList", {
-          users: users,
+          room: findRoom(data.roomName, rooms),
         });
       });
 
       socket.on("userJoin", (data: userJoinData) => {
-        users.push({
+        const user: User = {
           isHost: false,
           id: data.currentSocketID,
           currentRoom: data.roomName,
-        });
+        };
+        addUser(data.roomName, user, rooms);
 
         socket.emit("usersList", {
-          users: users,
+          room: findRoom(data.roomName, rooms),
         });
       });
 
