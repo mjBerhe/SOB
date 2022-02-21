@@ -33,7 +33,7 @@ const Room: NextPage = () => {
       console.log("socket connected!", socket.id);
 
       const userID = localStorage.getItem("hostID");
-      console.log(`userID: ${userID}`);
+      // console.log(`userID: ${userID}`);
       if (socket?.id && userID?.slice(0, 4) === socketID) {
         // console.log("This is the host");
         socket.emit("hostJoin", {

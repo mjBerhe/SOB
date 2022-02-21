@@ -82,9 +82,10 @@ const socketHandler = (req: NextApiRequest, res: NextApiResponseServerIO) => {
           id: data.currentSocketID,
           currentRoom: data.roomName,
         };
+        socket.join(data.roomName);
         addUser(data.roomName, user, rooms);
 
-        socket.emit("usersList", {
+        io.to(data.roomName).emit("usersList", {
           room: findRoom(data.roomName, rooms),
         });
       });
@@ -95,9 +96,10 @@ const socketHandler = (req: NextApiRequest, res: NextApiResponseServerIO) => {
           id: data.currentSocketID,
           currentRoom: data.roomName,
         };
+        socket.join(data.roomName);
         addUser(data.roomName, user, rooms);
 
-        socket.emit("usersList", {
+        io.to(data.roomName).emit("usersList", {
           room: findRoom(data.roomName, rooms),
         });
       });
