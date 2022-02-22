@@ -19,8 +19,7 @@ export const addUser = (roomName: string, newUser: User, rooms: Room[]) => {
     return;
   }
   if (roomIndex >= 0) {
-    // room found
-    // check if newUser is already inside the room
+    // room found > check if newUser is already inside the room
     const userIndex = rooms[roomIndex].users.findIndex(
       (user) => user.id === newUser.id
     );
@@ -34,6 +33,37 @@ export const addUser = (roomName: string, newUser: User, rooms: Room[]) => {
     if (userIndex === -1) {
       // newUser is not inside room
       rooms[roomIndex].users.push(newUser);
+      return;
+    }
+  }
+};
+
+export const removeUser = (
+  roomName: string,
+  existingUser: User,
+  rooms: Room[]
+) => {
+  // first check if room exists
+  const roomIndex = rooms.findIndex((room) => room.name === roomName);
+  if (roomIndex === -1) {
+    console.log(`Error, [room]:${roomName} not found `);
+    return;
+  }
+  if (roomIndex >= 0) {
+    // find user in room
+    const userIndex = rooms[roomIndex].users.findIndex(
+      (user) => user.id === existingUser.id
+    );
+    if (userIndex === -1) {
+      console.log(`Error, [user]: ${existingUser.id} not found`);
+      return;
+    }
+    // if user is found in room, remove user
+    if (userIndex >= 0) {
+      const tempUsers = rooms[roomIndex].users;
+      tempUsers.splice(userIndex, 1);
+      rooms[roomIndex].users = tempUsers;
+      return;
     }
   }
 };

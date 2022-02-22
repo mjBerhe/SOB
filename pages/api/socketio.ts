@@ -3,7 +3,7 @@ import { NextApiResponseServerIO } from "../../types/NextApiResponseServerIO";
 import { Server as ServerIO } from "socket.io";
 import { Server as NetServer } from "http";
 
-import { addUser, findRoom } from "../../utils/socketio/users";
+import { addUser, removeUser, findRoom } from "../../utils/socketio/users";
 
 export const config = {
   api: {
@@ -50,9 +50,6 @@ const socketHandler = (req: NextApiRequest, res: NextApiResponseServerIO) => {
     let hostID: string;
     let roomName: string;
     const rooms: Room[] = [];
-    const users: User[] = [];
-
-    // *usersList EMIT MUST BE A BROADCAST?? EVERYONE ON SOCKET MUST RECIEVE SOMEHOW
 
     io.on("connection", (socket) => {
       console.log(`${socket.id} connected`);
@@ -85,7 +82,7 @@ const socketHandler = (req: NextApiRequest, res: NextApiResponseServerIO) => {
         socket.join(data.roomName);
         addUser(data.roomName, user, rooms);
 
-        io.to(data.roomName).emit("usersList", {
+        io.to(data.roomName).emit("roomInfo", {
           room: findRoom(data.roomName, rooms),
         });
       });
@@ -99,13 +96,31 @@ const socketHandler = (req: NextApiRequest, res: NextApiResponseServerIO) => {
         socket.join(data.roomName);
         addUser(data.roomName, user, rooms);
 
-        io.to(data.roomName).emit("usersList", {
+        io.to(data.roomName).emit("roomInfo", {
           room: findRoom(data.roomName, rooms),
         });
       });
 
+      // we have to remove the user on the server and relay the updated users
+      socket.on("disconnecting", () => {
+        const arrRooms = Array.from(socket.rooms);
+        for (let i = 0; i < arrRooms.length; i++) {
+          if (rooms.map((room) => room.name).includes(arrRooms[i])) {
+            const user: User = {
+              isHost: socket.id === hostID ? true : false,
+              id: socket.id,
+              currentRoom: arrRooms[i],
+            };
+            removeUser(arrRooms[i], user, rooms);
+            io.to(arrRooms[i]).emit("roomInfo", {
+              room: findRoom(arrRooms[i], rooms),
+            });
+          }
+        }
+      });
+
       socket.on("disconnect", () => {
-        console.log(`disconnecting ${socket.id}`);
+        console.log(`[SOCKET]: ${socket.id} has disconnected`);
       });
     });
   }

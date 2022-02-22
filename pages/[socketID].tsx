@@ -11,11 +11,25 @@ const WheelSpinner = dynamic(
   { ssr: false }
 );
 
-type user = {
+type User = {
   isHost: boolean;
   hostID?: string;
   id: string;
   currentRoom: string;
+};
+
+type Room = {
+  name: string;
+  users: User[];
+};
+
+type UserDisconnectingData = {
+  roomName: string;
+  currentSocketID: string;
+};
+
+type RoomInfo = {
+  room: Room;
 };
 
 const socket = io({ path: "/api/socketio" });
@@ -24,7 +38,21 @@ const Room: NextPage = () => {
   const router = useRouter();
   const { socketID } = router.query;
 
-  const [users, setUsers] = useState<user[]>([]);
+  const [users, setUsers] = useState<User[]>([]);
+
+  const removeUser = (userID: string, users: User[]) => {
+    console.log(users);
+    const tempUsers = users;
+    console.log(tempUsers);
+    const userIndex = tempUsers.findIndex((user) => user.id === userID);
+    console.log(userIndex);
+    if (userIndex >= 0) {
+      tempUsers.splice(userIndex, 1);
+      // setUsers(tempUsers);
+    } else {
+      console.log(`ERROR, can not remove [user]: ${userID} from room`);
+    }
+  };
 
   // *ISSUE: host does not rejoin if page reloads because socketID from query hasn't loaded yet
   // I can just make a custom button for host to rejoin when query has loaded
@@ -51,9 +79,15 @@ const Room: NextPage = () => {
       }
     });
 
-    socket.on("usersList", (data) => {
+    socket.on("roomInfo", (data: RoomInfo) => {
       console.log(data);
-      setUsers(data.room.users);
+      setUsers(data?.room?.users);
+    });
+
+    socket.on("userDisconnecting", (data: UserDisconnectingData) => {
+      // removeUser function
+      console.log(data.roomName);
+      removeUser(data.currentSocketID, users);
     });
 
     socket.on("disconnect", () => {
@@ -63,13 +97,27 @@ const Room: NextPage = () => {
     if (socket) return () => socket.disconnect();
   }, []);
 
+  useEffect(() => {
+    console.log(users);
+  }, [users]);
+
   return (
     <div className="min-h-screen flex flex-col items-center justify-center">
       <h2>Room Name: {socketID}</h2>
       {/* <WheelSpinner /> */}
       <div>
         <span>Users in room:</span>
-        <div className="flex flex-col">{users.map((user) => user.id)}</div>
+        <div className="flex flex-col">
+          {users.map((user) => (
+            <div key={user.id}>{user.id}</div>
+          ))}
+        </div>
+        <button
+          className="outline-none border border-white"
+          onClick={() => console.log(users)}
+        >
+          Check Users
+        </button>
       </div>
     </div>
   );
