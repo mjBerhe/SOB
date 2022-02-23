@@ -15,6 +15,7 @@ type User = {
   isHost: boolean;
   hostID?: string;
   id: string;
+  username: string;
   currentRoom: string;
 };
 
@@ -72,9 +73,11 @@ const Room: NextPage = () => {
       }
       if (socket?.id && userID?.slice(0, 4) !== socketID) {
         // console.log("Not host");
+        const username = localStorage.getItem("name");
         socket.emit("userJoin", {
           roomName: socketID,
           currentSocketID: socket.id,
+          username: username ? username : null,
         });
       }
     });
@@ -109,7 +112,7 @@ const Room: NextPage = () => {
         <span>Users in room:</span>
         <div className="flex flex-col">
           {users.map((user) => (
-            <div key={user.id}>{user.id}</div>
+            <div key={user.id}>{user.username}</div>
           ))}
         </div>
         <button

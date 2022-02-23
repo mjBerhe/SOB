@@ -40,7 +40,7 @@ export const addUser = (roomName: string, newUser: User, rooms: Room[]) => {
 
 export const removeUser = (
   roomName: string,
-  existingUser: User,
+  existingUserID: string,
   rooms: Room[]
 ) => {
   // first check if room exists
@@ -52,10 +52,10 @@ export const removeUser = (
   if (roomIndex >= 0) {
     // find user in room
     const userIndex = rooms[roomIndex].users.findIndex(
-      (user) => user.id === existingUser.id
+      (user) => user.id === existingUserID
     );
     if (userIndex === -1) {
-      console.log(`Error, [user]: ${existingUser.id} not found`);
+      console.log(`Error, [user]: ${existingUserID} not found`);
       return;
     }
     // if user is found in room, remove user

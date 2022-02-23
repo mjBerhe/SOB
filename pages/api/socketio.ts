@@ -20,6 +20,7 @@ type userJoinData = {
   hostID?: string;
   roomName: string;
   currentSocketID: string;
+  username?: string;
 };
 
 type Room = {
@@ -31,6 +32,7 @@ type User = {
   isHost: boolean;
   hostID?: string;
   id: string;
+  username: string;
   currentRoom: string;
 };
 
@@ -78,6 +80,7 @@ const socketHandler = (req: NextApiRequest, res: NextApiResponseServerIO) => {
           hostID: data.hostID,
           id: data.currentSocketID,
           currentRoom: data.roomName,
+          username: "Host",
         };
         socket.join(data.roomName);
         addUser(data.roomName, user, rooms);
@@ -92,6 +95,9 @@ const socketHandler = (req: NextApiRequest, res: NextApiResponseServerIO) => {
           isHost: false,
           id: data.currentSocketID,
           currentRoom: data.roomName,
+          username: data.username
+            ? data.username
+            : `Guest ${data.currentSocketID.slice(0, 4)}`,
         };
         socket.join(data.roomName);
         addUser(data.roomName, user, rooms);
@@ -106,12 +112,7 @@ const socketHandler = (req: NextApiRequest, res: NextApiResponseServerIO) => {
         const arrRooms = Array.from(socket.rooms);
         for (let i = 0; i < arrRooms.length; i++) {
           if (rooms.map((room) => room.name).includes(arrRooms[i])) {
-            const user: User = {
-              isHost: socket.id === hostID ? true : false,
-              id: socket.id,
-              currentRoom: arrRooms[i],
-            };
-            removeUser(arrRooms[i], user, rooms);
+            removeUser(arrRooms[i], socket.id, rooms);
             io.to(arrRooms[i]).emit("roomInfo", {
               room: findRoom(arrRooms[i], rooms),
             });
