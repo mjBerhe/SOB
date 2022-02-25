@@ -1,14 +1,4 @@
-type Room = {
-  name: string;
-  users: User[];
-};
-
-type User = {
-  isHost: boolean;
-  hostID?: string;
-  id: string;
-  currentRoom: string;
-};
+import { User, Room } from "../../types/LobbyTypes";
 
 export const addUser = (roomName: string, newUser: User, rooms: Room[]) => {
   // first check if room exists

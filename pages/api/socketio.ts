@@ -4,6 +4,7 @@ import { Server as ServerIO } from "socket.io";
 import { Server as NetServer } from "http";
 
 import { addUser, removeUser, findRoom } from "../../utils/socketio/users";
+import { User, Room } from "../../types/LobbyTypes";
 
 export const config = {
   api: {
@@ -22,21 +23,6 @@ type userJoinData = {
   currentSocketID: string;
   username?: string;
 };
-
-type Room = {
-  name: string;
-  users: User[];
-};
-
-type User = {
-  isHost: boolean;
-  hostID?: string;
-  id: string;
-  username: string;
-  currentRoom: string;
-};
-
-// need to make rooms = { roomName: [users here] }
 
 const socketHandler = (req: NextApiRequest, res: NextApiResponseServerIO) => {
   if (!res.socket.server.io) {
