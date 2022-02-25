@@ -3,12 +3,12 @@ import { Wheel } from "react-custom-roulette";
 
 const WheelSpinner: React.FC = () => {
   const data = [
-    { option: "math" },
+    { option: "MATH", style: { backgroundColor: "blue", textColor: "white" } },
     { option: "science" },
     { option: "history" },
   ];
   const [wheelOptions, setWheelOptions] = useState([
-    { option: "MATH" },
+    { option: "MATH", style: { backgroundColor: "blue", textColor: "white" } },
     { option: "SCIENCE" },
     { option: "HISTORY" },
   ]);
@@ -29,6 +29,34 @@ const WheelSpinner: React.FC = () => {
 
   const finishSpinning = () => {
     setStartSpinning(false);
+  };
+
+  const addSubject = (subject: string) => {
+    const wheelOptionIndex = data.findIndex(
+      (option) => option.option === subject
+    );
+    if (wheelOptionIndex > -1) {
+      const tempWheelOptions = [...wheelOptions];
+      tempWheelOptions.push(data[wheelOptionIndex]);
+      setWheelOptions(tempWheelOptions);
+    } else {
+      console.log(`ERROR, [SUBJECT]: ${subject} is not a valid option`);
+    }
+  };
+
+  const removeSubject = (subject: string) => {
+    const tempWheelOptions = [...wheelOptions];
+    const wheelOptionIndex = tempWheelOptions.findIndex(
+      (option) => option.option === subject
+    );
+    if (wheelOptionIndex > -1) {
+      console.log(wheelOptionIndex);
+      tempWheelOptions.splice(wheelOptionIndex, 1);
+      console.log(tempWheelOptions);
+      setWheelOptions(tempWheelOptions);
+    } else {
+      console.log(`ERROR, [SUBJECT]: ${subject} is not on the wheel`);
+    }
   };
 
   const btnClass =
@@ -52,6 +80,11 @@ const WheelSpinner: React.FC = () => {
         <button onClick={() => addWheelItem("Test")} className={btnClass}>
           Add Item
         </button>
+        <div className="flex items-center space-x-2">
+          <button onClick={() => addSubject("MATH")}>+</button>
+          <span>Math</span>
+          <button onClick={() => removeSubject("MATH")}>-</button>
+        </div>
       </div>
     </div>
   );
