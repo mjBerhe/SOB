@@ -1,7 +1,7 @@
 import type { NextPage } from "next";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/router";
-import { io } from "socket.io-client";
+import { io, Socket } from "socket.io-client";
 import dynamic from "next/dynamic";
 import { User, Room } from "../types/LobbyTypes";
 
@@ -23,52 +23,61 @@ type RoomInfo = {
   room: Room;
 };
 
-const socket = io({ path: "/api/socketio" });
+// const socket = io({ path: "/api/socketio" });
 
 const Room: NextPage = () => {
   const router = useRouter();
   const { socketID } = router.query;
 
+  const [socket, setSocket] = useState<Socket | null>(null);
   const [users, setUsers] = useState<User[]>([]);
+
+  useEffect((): any => {
+    const socket = io({ path: "/api/socketio" });
+    setSocket(socket);
+
+    if (socket) return () => socket.disconnect();
+  }, []);
 
   // *ISSUE: host does not rejoin if page reloads because socketID from query hasn't loaded yet
   // I can just make a custom button for host to rejoin when query has loaded
   useEffect((): any => {
-    socket.on("connect", () => {
-      console.log("socket connected!", socket.id);
+    if (socket) {
+      socket.on("connect", () => {
+        console.log("socket connected!", socket.id);
+        const userID = localStorage.getItem("hostID");
 
-      const userID = localStorage.getItem("hostID");
-      // console.log(`userID: ${userID}`);
-      if (socket?.id && userID?.slice(0, 4) === socketID) {
-        // console.log("This is the host");
-        socket.emit("hostJoin", {
-          hostID: userID,
-          roomName: socketID,
-          currentSocketID: socket.id,
-        });
-      }
-      if (socket?.id && userID?.slice(0, 4) !== socketID) {
-        // console.log("Not host");
-        const username = localStorage.getItem("name");
-        socket.emit("userJoin", {
-          roomName: socketID,
-          currentSocketID: socket.id,
-          username: username ? username : null,
-        });
-      }
-    });
+        if (socket?.id && userID?.slice(0, 4) === socketID) {
+          // console.log("This is the host");
+          socket.emit("hostJoin", {
+            hostID: userID,
+            roomName: socketID,
+            currentSocketID: socket.id,
+          });
+        }
+        if (socket?.id && userID?.slice(0, 4) !== socketID) {
+          // console.log("Not host");
+          const username = localStorage.getItem("name");
+          socket.emit("userJoin", {
+            roomName: socketID,
+            currentSocketID: socket.id,
+            username: username ? username : null,
+          });
+        }
+      });
 
-    socket.on("roomInfo", (data: RoomInfo) => {
-      console.log(data);
-      setUsers(data?.room?.users);
-    });
+      socket.on("roomInfo", (data: RoomInfo) => {
+        console.log(data);
+        setUsers(data?.room?.users);
+      });
 
-    socket.on("disconnect", () => {
-      console.log("socket disconnected");
-    });
+      socket.on("disconnect", () => {
+        console.log("socket disconnected");
+      });
+    }
 
     if (socket) return () => socket.disconnect();
-  }, []);
+  }, [socket]);
 
   useEffect(() => {
     console.log(users);
