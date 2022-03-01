@@ -1,9 +1,10 @@
-A. Ways to incorparate a phone
+// Ways to incorporate a phone
   1. Players can lock in when they have answered a question with their phone
     - fastest correct answer, gets an advantage in the next question
 
 
-Topics
+// Topics
+
 1. Math
 2. Science
 3. Geography
@@ -12,8 +13,19 @@ Topics
 6. Literature/Art
 7. Shows/Movies
 
-Types of Questions
+// Types of Questions
 
 1. Normal Questions
   - question shows on screen
   - timer 
+
+// Flow of Game
+
+1. People join room
+2. Show Rules
+
+3. Spinner
+4. Question
+5. Scoreboard
+
+6. Repeat 3-5

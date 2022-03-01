@@ -6,6 +6,7 @@ import dynamic from "next/dynamic";
 import { User, Room } from "../types/LobbyTypes";
 
 import LobbyScreen from "../components/lobbyScreen";
+import QuestionScreen from "../components/questionScreen";
 
 const WheelSpinner = dynamic(
   () => {
@@ -14,16 +15,14 @@ const WheelSpinner = dynamic(
   { ssr: false }
 );
 
-type UserDisconnectingData = {
-  roomName: string;
-  currentSocketID: string;
-};
-
 type RoomInfo = {
   room: Room;
 };
 
-// const socket = io({ path: "/api/socketio" });
+type Question = {
+  subject: string;
+  level: number;
+};
 
 const Room: NextPage = () => {
   const router = useRouter();
@@ -67,7 +66,7 @@ const Room: NextPage = () => {
       });
 
       socket.on("roomInfo", (data: RoomInfo) => {
-        console.log(data);
+        // console.log(data);
         setUsers(data?.room?.users);
       });
 
@@ -79,14 +78,38 @@ const Room: NextPage = () => {
     if (socket) return () => socket.disconnect();
   }, [socket]);
 
+  const [isHost, setIsHost] = useState<boolean>(false);
+  const [showSpinner, setShowSpinner] = useState<boolean>(false);
+  const [showQuestion, setShowQuestion] = useState<boolean>(true);
+
   useEffect(() => {
     console.log(users);
+    if (socket) {
+      const hostIndex = users.findIndex((user) => user.isHost === true);
+      if (hostIndex > -1) {
+        if (users[hostIndex].id === socket.id) {
+          setIsHost(true);
+        }
+      } else {
+        console.log(`ERROR: no host found in room`);
+      }
+    }
   }, [users]);
 
-  const [showSpinner, setShowSpinner] = useState(false);
+  useEffect(() => {
+    console.log(isHost);
+  }, [isHost]);
 
   const btnClass =
     "outline-none border border-white p-2 rounded-lg hover:bg-gray-500";
+
+  const [currentQuestion, setCurrentQuestion] = useState<Question>({
+    subject: "MATH",
+    level: 1,
+  });
+
+  // if
+  const handleStartGame = () => {};
 
   return (
     <div className="min-h-screen flex flex-col items-center justify-center">
@@ -98,9 +121,13 @@ const Room: NextPage = () => {
         >
           Show Spinner
         </button>
+        <button className={btnClass} onClick={handleStartGame}>
+          Start Game
+        </button>
       </div>
       {!showSpinner && <LobbyScreen socketID={socketID} users={users} />}
       {showSpinner && <WheelSpinner />}
+      {showQuestion && <QuestionScreen currentQuestion={currentQuestion} />}
     </div>
   );
 };
