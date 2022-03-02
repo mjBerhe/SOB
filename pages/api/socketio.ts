@@ -66,8 +66,14 @@ const socketHandler = (req: NextApiRequest, res: NextApiResponseServerIO) => {
       });
 
       socket.on("startGameRequest", (data: gameRequestData) => {
+        console.log(data.id, hostID);
         if (data.id === hostID) {
-          console.log(roomName);
+          // this is host, so start game
+          io.to(roomName).emit("startGameResponse", {
+            status: true,
+          });
+        } else {
+          console.log(`ERROR, user attempting to start game is not the host`);
         }
       });
 

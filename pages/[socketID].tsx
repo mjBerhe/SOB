@@ -25,12 +25,21 @@ type Question = {
   level: number;
 };
 
+type StartGameReponse = {
+  status: boolean;
+};
+
 const Room: NextPage = () => {
   const router = useRouter();
   const { socketID } = router.query;
 
   const [socket, setSocket] = useState<Socket | null>(null);
+  const [hostID, setHostID] = useState<string>("");
   const [users, setUsers] = useState<User[]>([]);
+
+  const [isHost, setIsHost] = useState<boolean>(false);
+  const [showSpinner, setShowSpinner] = useState<boolean>(false);
+  const [showQuestion, setShowQuestion] = useState<boolean>(true);
 
   useEffect((): any => {
     const socket = io({ path: "/api/socketio" });
@@ -46,6 +55,7 @@ const Room: NextPage = () => {
       socket.on("connect", () => {
         console.log("socket connected!", socket.id);
         const userID = localStorage.getItem("hostID");
+        setHostID(userID ? userID : "");
 
         if (socket?.id && userID?.slice(0, 4) === socketID) {
           // console.log("This is the host");
@@ -71,6 +81,14 @@ const Room: NextPage = () => {
         setUsers(data?.room?.users);
       });
 
+      socket.on("startGameResponse", (data: StartGameReponse) => {
+        if (data.status === true) {
+          setShowSpinner(true);
+        } else {
+          console.log(data);
+        }
+      });
+
       socket.on("disconnect", () => {
         console.log("socket disconnected");
       });
@@ -78,10 +96,6 @@ const Room: NextPage = () => {
 
     if (socket) return () => socket.disconnect();
   }, [socket]);
-
-  const [isHost, setIsHost] = useState<boolean>(false);
-  const [showSpinner, setShowSpinner] = useState<boolean>(false);
-  const [showQuestion, setShowQuestion] = useState<boolean>(true);
 
   useEffect(() => {
     console.log(users);
@@ -97,10 +111,6 @@ const Room: NextPage = () => {
     }
   }, [users]);
 
-  useEffect(() => {
-    console.log(isHost);
-  }, [isHost]);
-
   const [currentQuestion, setCurrentQuestion] = useState<Question>({
     subject: "MATH",
     level: 1,
@@ -108,9 +118,10 @@ const Room: NextPage = () => {
 
   // send a request to start the game
   const handleStartGame = () => {
+    console.log("hello");
     if (socket) {
       socket.emit("startGameRequest", {
-        id: socket.id,
+        id: hostID ? hostID : socket.id,
         message: "Attempting to start game",
       });
     } else {
