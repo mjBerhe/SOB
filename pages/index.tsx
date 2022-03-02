@@ -2,13 +2,12 @@ import type { NextPage } from "next";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/router";
 import { io, Socket } from "socket.io-client";
+import Button from "../components/inputs/Button";
 
 type roomData = {
   host: string;
   roomName: string;
 };
-
-// const socket = io({ path: "/api/socketio" });
 
 const Home: NextPage = () => {
   const router = useRouter();
@@ -63,18 +62,8 @@ const Home: NextPage = () => {
   return (
     <div className="min-h-screen flex items-center justify-center">
       <div className="flex space-x-4">
-        <button
-          className="outline-none border border-white p-4 rounded-lg"
-          onClick={handleCreateRoom}
-        >
-          Create Room
-        </button>
-        <button
-          className="outline-none border border-white p-4 rounded-lg"
-          onClick={handleJoinRoom}
-        >
-          Join Room
-        </button>
+        <Button onClick={handleCreateRoom}>Create Room</Button>
+        <Button onClick={handleJoinRoom}>Join Room</Button>
       </div>
     </div>
   );

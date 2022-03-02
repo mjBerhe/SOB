@@ -2,6 +2,8 @@ import type { NextPage } from "next";
 import React, { useState } from "react";
 import { useRouter } from "next/router";
 
+import Button from "../components/inputs/Button";
+
 const Join: NextPage = () => {
   const router = useRouter();
 
@@ -45,13 +47,9 @@ const Join: NextPage = () => {
           />
         </div>
         <div className="flex justify-center">
-          <button
-            className="outline-none border border-white p-4 rounded-lg w-full"
-            type="button"
-            onClick={handleJoinRoom}
-          >
+          <Button className="w-full h-12" onClick={handleJoinRoom}>
             Join
-          </button>
+          </Button>
         </div>
       </div>
     </div>

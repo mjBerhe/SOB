@@ -17,6 +17,11 @@ type roomRequestData = {
   message: string;
 };
 
+type gameRequestData = {
+  id: string;
+  message: string;
+};
+
 type userJoinData = {
   hostID?: string;
   roomName: string;
@@ -58,6 +63,12 @@ const socketHandler = (req: NextApiRequest, res: NextApiResponseServerIO) => {
           host: socket.id,
           roomName: roomName,
         });
+      });
+
+      socket.on("startGameRequest", (data: gameRequestData) => {
+        if (data.id === hostID) {
+          console.log(roomName);
+        }
       });
 
       socket.on("hostJoin", (data: userJoinData) => {

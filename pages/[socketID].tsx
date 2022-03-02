@@ -5,6 +5,7 @@ import { io, Socket } from "socket.io-client";
 import dynamic from "next/dynamic";
 import { User, Room } from "../types/LobbyTypes";
 
+import Button from "../components/inputs/Button";
 import LobbyScreen from "../components/lobbyScreen";
 import QuestionScreen from "../components/questionScreen";
 
@@ -100,30 +101,31 @@ const Room: NextPage = () => {
     console.log(isHost);
   }, [isHost]);
 
-  const btnClass =
-    "outline-none border border-white p-2 rounded-lg hover:bg-gray-500";
-
   const [currentQuestion, setCurrentQuestion] = useState<Question>({
     subject: "MATH",
     level: 1,
   });
 
-  // if
-  const handleStartGame = () => {};
+  // send a request to start the game
+  const handleStartGame = () => {
+    if (socket) {
+      socket.emit("startGameRequest", {
+        id: socket.id,
+        message: "Attempting to start game",
+      });
+    } else {
+      console.log(`ERROR: socket not connected to make start game`);
+    }
+  };
 
   return (
     <div className="min-h-screen flex flex-col items-center justify-center">
       <div className="flex mb-4 space-x-2">
-        <button className={btnClass}>Show Rules</button>
-        <button
-          className={btnClass}
-          onClick={() => setShowSpinner((prev) => !prev)}
-        >
+        <Button>Show Rules</Button>
+        <Button onClick={() => setShowSpinner((prev) => !prev)}>
           Show Spinner
-        </button>
-        <button className={btnClass} onClick={handleStartGame}>
-          Start Game
-        </button>
+        </Button>
+        <Button onClick={handleStartGame}>Start Game</Button>
       </div>
       {!showSpinner && <LobbyScreen socketID={socketID} users={users} />}
       {showSpinner && <WheelSpinner />}
