@@ -99,6 +99,7 @@ const Room: NextPage = () => {
 
   useEffect(() => {
     console.log(users);
+    // sets isHost to true if the host just joined
     if (socket) {
       const hostIndex = users.findIndex((user) => user.isHost === true);
       if (hostIndex > -1) {
@@ -118,7 +119,6 @@ const Room: NextPage = () => {
 
   // send a request to start the game
   const handleStartGame = () => {
-    console.log("hello");
     if (socket) {
       socket.emit("startGameRequest", {
         id: hostID ? hostID : socket.id,

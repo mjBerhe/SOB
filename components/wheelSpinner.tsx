@@ -9,57 +9,79 @@ type WheelItem = {
   };
 };
 
+type WheelData = {
+  [key: string]: {
+    option: string;
+    style: {
+      backgroundColor: string;
+      textColor: string;
+    };
+  };
+};
+
+type SubjectLevels = {
+  [key: string]: number;
+};
+
+const data: WheelData = {
+  MATH: {
+    option: "MATH",
+    style: { backgroundColor: "#2E7C87", textColor: "black" },
+  },
+  SCIENCE: {
+    option: "SCIENCE",
+    style: { backgroundColor: "#EE4521", textColor: "black" },
+  },
+  HISTORY: {
+    option: "HISTORY",
+    style: { backgroundColor: "#54332B", textColor: "white" },
+  },
+  TEST: {
+    option: "TEST",
+    style: { backgroundColor: "#873BA5", textColor: "black" },
+  },
+};
+
 const WheelSpinner: React.FC = () => {
-  const data = [
-    {
-      option: "MATH",
-      style: { backgroundColor: "#2E7C87", textColor: "black" },
-    },
-    {
-      option: "SCIENCE",
-      style: { backgroundColor: "#EE4521", textColor: "black" },
-    },
-    {
-      option: "HISTORY",
-      style: { backgroundColor: "#54332B", textColor: "white" },
-    },
-    {
-      option: "TEST",
-      style: { backgroundColor: "#873BA5", textColor: "black" },
-    },
-  ];
-  const [wheelOptions, setWheelOptions] = useState<WheelItem[]>([
-    {
-      option: "MATH",
-      style: { backgroundColor: "#2E7C87", textColor: "black" },
-    },
-    {
-      option: "SCIENCE",
-      style: { backgroundColor: "#EE4521", textColor: "black" },
-    },
-    {
-      option: "HISTORY",
-      style: { backgroundColor: "#54332B", textColor: "white" },
-    },
+  const [subjectLevels, setSubjectLevels] = useState<SubjectLevels>({
+    MATH: 1,
+    SCIENCE: 1,
+    HISTORY: 1,
+    TEST: 1,
+  });
+  const [currentSubjects, setCurrentSubjects] = useState<string[]>([
+    "MATH",
+    "SCIENCE",
+    "HISTORY",
   ]);
+  // const [wheelOptions, setWheelOptions] = useState<WheelItem[]>([
+  //   {
+  //     option: "MATH",
+  //     style: { backgroundColor: "#2E7C87", textColor: "black" },
+  //   },
+  //   {
+  //     option: "SCIENCE",
+  //     style: { backgroundColor: "#EE4521", textColor: "black" },
+  //   },
+  //   {
+  //     option: "HISTORY",
+  //     style: { backgroundColor: "#54332B", textColor: "white" },
+  //   },
+  // ]);
   const [startSpinning, setStartSpinning] = useState<boolean>(false);
   const [winningPrize, setWinningPrize] = useState<number>(0);
 
   const handleStartSpin = () => {
-    const winner = getRandomInt(wheelOptions.length);
+    const winner = getRandomInt(currentSubjects.length);
     setWinningPrize(winner);
     setStartSpinning(true);
   };
 
-  const addWheelItem = (wheelItem: string) => {
-    const newItemIndex = data.findIndex((item) => item.option === wheelItem);
-    if (newItemIndex > -1) {
-      const newItem = data[newItemIndex];
-      const tempWheelOptions = [...wheelOptions];
-      tempWheelOptions.push(newItem);
-      setWheelOptions(tempWheelOptions);
+  const addNewSubject = (newSubject: string) => {
+    if (currentSubjects.includes(newSubject)) {
+      console.log(`ERROR, [SUBJECT]: ${newSubject} already exists`);
     } else {
-      console.log(`ERROR, [ITEM]: ${wheelItem} is not a valid wheelItem`);
+      setCurrentSubjects((prev) => [...prev, newSubject]);
     }
   };
 
@@ -67,33 +89,33 @@ const WheelSpinner: React.FC = () => {
     setStartSpinning(false);
   };
 
-  const addSubject = (subject: string) => {
-    const wheelOptionIndex = data.findIndex(
-      (option) => option.option === subject
-    );
-    if (wheelOptionIndex > -1) {
-      const tempWheelOptions = [...wheelOptions];
-      tempWheelOptions.push(data[wheelOptionIndex]);
-      setWheelOptions(tempWheelOptions);
-    } else {
-      console.log(`ERROR, [SUBJECT]: ${subject} is not a valid option`);
-    }
-  };
+  // const addSubject = (subject: string) => {
+  //   const wheelOptionIndex = data.findIndex(
+  //     (option) => option.option === subject
+  //   );
+  //   if (wheelOptionIndex > -1) {
+  //     const tempWheelOptions = [...wheelOptions];
+  //     tempWheelOptions.push(data[wheelOptionIndex]);
+  //     setWheelOptions(tempWheelOptions);
+  //   } else {
+  //     console.log(`ERROR, [SUBJECT]: ${subject} is not a valid option`);
+  //   }
+  // };
 
-  const removeSubject = (subject: string) => {
-    const tempWheelOptions = [...wheelOptions];
-    const wheelOptionIndex = tempWheelOptions.findIndex(
-      (option) => option.option === subject
-    );
-    if (wheelOptionIndex > -1) {
-      console.log(wheelOptionIndex);
-      tempWheelOptions.splice(wheelOptionIndex, 1);
-      console.log(tempWheelOptions);
-      setWheelOptions(tempWheelOptions);
-    } else {
-      console.log(`ERROR, [SUBJECT]: ${subject} is not on the wheel`);
-    }
-  };
+  // const removeSubject = (subject: string) => {
+  //   const tempWheelOptions = [...wheelOptions];
+  //   const wheelOptionIndex = tempWheelOptions.findIndex(
+  //     (option) => option.option === subject
+  //   );
+  //   if (wheelOptionIndex > -1) {
+  //     console.log(wheelOptionIndex);
+  //     tempWheelOptions.splice(wheelOptionIndex, 1);
+  //     console.log(tempWheelOptions);
+  //     setWheelOptions(tempWheelOptions);
+  //   } else {
+  //     console.log(`ERROR, [SUBJECT]: ${subject} is not on the wheel`);
+  //   }
+  // };
 
   const btnClass =
     "outline-none border border-white p-2 rounded-lg hover:bg-gray-500";
@@ -104,7 +126,10 @@ const WheelSpinner: React.FC = () => {
         <Wheel
           mustStartSpinning={startSpinning}
           prizeNumber={winningPrize}
-          data={wheelOptions}
+          data={currentSubjects.map((subject) => ({
+            option: `${data[subject].option} [${subjectLevels[subject]}]`,
+            style: data[subject].style,
+          }))}
           onStopSpinning={finishSpinning}
         />
       </div>
@@ -113,10 +138,10 @@ const WheelSpinner: React.FC = () => {
         <button onClick={handleStartSpin} className={btnClass}>
           Spin
         </button>
-        <button onClick={() => addWheelItem("TEST")} className={btnClass}>
+        <button onClick={() => addNewSubject("TEST")} className={btnClass}>
           Add Item
         </button>
-        {wheelOptions.map((item) => (
+        {/* {wheelOptions.map((item) => (
           <div
             key={item.option}
             className="flex items-center space-x-2 border border-white rounded-lg p-2"
@@ -125,7 +150,7 @@ const WheelSpinner: React.FC = () => {
             <span>{item.option}</span>
             <button onClick={() => removeSubject(item.option)}>-</button>
           </div>
-        ))}
+        ))} */}
       </div>
     </div>
   );
