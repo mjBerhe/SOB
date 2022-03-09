@@ -54,20 +54,6 @@ const WheelSpinner: React.FC = () => {
     "SCIENCE",
     "HISTORY",
   ]);
-  // const [wheelOptions, setWheelOptions] = useState<WheelItem[]>([
-  //   {
-  //     option: "MATH",
-  //     style: { backgroundColor: "#2E7C87", textColor: "black" },
-  //   },
-  //   {
-  //     option: "SCIENCE",
-  //     style: { backgroundColor: "#EE4521", textColor: "black" },
-  //   },
-  //   {
-  //     option: "HISTORY",
-  //     style: { backgroundColor: "#54332B", textColor: "white" },
-  //   },
-  // ]);
   const [startSpinning, setStartSpinning] = useState<boolean>(false);
   const [winningPrize, setWinningPrize] = useState<number>(0);
 
@@ -75,6 +61,10 @@ const WheelSpinner: React.FC = () => {
     const winner = getRandomInt(currentSubjects.length);
     setWinningPrize(winner);
     setStartSpinning(true);
+  };
+
+  const finishSpinning = () => {
+    setStartSpinning(false);
   };
 
   const addNewSubject = (newSubject: string) => {
@@ -85,37 +75,26 @@ const WheelSpinner: React.FC = () => {
     }
   };
 
-  const finishSpinning = () => {
-    setStartSpinning(false);
+  const addSubject = (subject: string) => {
+    const subjectPool = Object.keys(data);
+    if (subjectPool.includes(subject)) {
+      // valid subject
+      setCurrentSubjects((prev) => [...prev, subject]);
+    } else {
+      console.log(`ERROR, [SUBJECT]: ${subject} is not a valid subject`);
+    }
   };
 
-  // const addSubject = (subject: string) => {
-  //   const wheelOptionIndex = data.findIndex(
-  //     (option) => option.option === subject
-  //   );
-  //   if (wheelOptionIndex > -1) {
-  //     const tempWheelOptions = [...wheelOptions];
-  //     tempWheelOptions.push(data[wheelOptionIndex]);
-  //     setWheelOptions(tempWheelOptions);
-  //   } else {
-  //     console.log(`ERROR, [SUBJECT]: ${subject} is not a valid option`);
-  //   }
-  // };
-
-  // const removeSubject = (subject: string) => {
-  //   const tempWheelOptions = [...wheelOptions];
-  //   const wheelOptionIndex = tempWheelOptions.findIndex(
-  //     (option) => option.option === subject
-  //   );
-  //   if (wheelOptionIndex > -1) {
-  //     console.log(wheelOptionIndex);
-  //     tempWheelOptions.splice(wheelOptionIndex, 1);
-  //     console.log(tempWheelOptions);
-  //     setWheelOptions(tempWheelOptions);
-  //   } else {
-  //     console.log(`ERROR, [SUBJECT]: ${subject} is not on the wheel`);
-  //   }
-  // };
+  const removeSubject = (subject: string) => {
+    if (currentSubjects.includes(subject)) {
+      const index = currentSubjects.findIndex((curSub) => curSub === subject);
+      const tempCurrentSubjects = [...currentSubjects];
+      tempCurrentSubjects.splice(index, 1);
+      setCurrentSubjects(tempCurrentSubjects);
+    } else {
+      console.log(`ERROR, [SUBJECT]: ${subject} is not a current subject`);
+    }
+  };
 
   const btnClass =
     "outline-none border border-white p-2 rounded-lg hover:bg-gray-500";
@@ -141,16 +120,18 @@ const WheelSpinner: React.FC = () => {
         <button onClick={() => addNewSubject("TEST")} className={btnClass}>
           Add Item
         </button>
-        {/* {wheelOptions.map((item) => (
-          <div
-            key={item.option}
-            className="flex items-center space-x-2 border border-white rounded-lg p-2"
-          >
-            <button onClick={() => addSubject(item.option)}>+</button>
-            <span>{item.option}</span>
-            <button onClick={() => removeSubject(item.option)}>-</button>
-          </div>
-        ))} */}
+        {currentSubjects
+          .filter((value, index, array) => array.indexOf(value) === index)
+          .map((subject) => (
+            <div
+              key={subject}
+              className="flex items-center space-x-2 border border-white rounded-lg p-2"
+            >
+              <button onClick={() => addSubject(subject)}>+</button>
+              <span>{subject}</span>
+              <button onClick={() => removeSubject(subject)}>-</button>
+            </div>
+          ))}
       </div>
     </div>
   );
