@@ -4,6 +4,7 @@ import { Server as ServerIO } from "socket.io";
 import { Server as NetServer } from "http";
 
 import { addUser, removeUser, findRoom } from "../../utils/socketio/users";
+import startGameHandler from "../../utils/eventHandlers/startGameRequest";
 import { User, Room } from "../../types/LobbyTypes";
 
 export const config = {
@@ -65,15 +66,29 @@ const socketHandler = (req: NextApiRequest, res: NextApiResponseServerIO) => {
         });
       });
 
+      startGameHandler(io, socket);
+
       socket.on("startGameRequest", (data: gameRequestData) => {
-        console.log(data.id, hostID);
         if (data.id === hostID) {
-          // this is host, so start game
+          // this is host, so continue
           io.to(roomName).emit("startGameResponse", {
             status: true,
           });
         } else {
           console.log(`ERROR, user attempting to start game is not the host`);
+        }
+      });
+
+      socket.on("resetGameRequest", (data: gameRequestData) => {
+        console.log(data.message);
+        if (data.id === hostID) {
+          // this is host, so continue
+          io.to(roomName).emit("resetGameResponse", {
+            status: true,
+          });
+          console.log(`[SUCCESS]: `);
+        } else {
+          console.log(`ERROR, user attempting to restart game is not the host`);
         }
       });
 

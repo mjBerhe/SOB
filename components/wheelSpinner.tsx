@@ -1,28 +1,6 @@
 import { useEffect, useState } from "react";
 import { Wheel } from "react-custom-roulette";
 
-type WheelItem = {
-  option: string;
-  style: {
-    backgroundColor: string;
-    textColor: string;
-  };
-};
-
-type WheelData = {
-  [key: string]: {
-    option: string;
-    style: {
-      backgroundColor: string;
-      textColor: string;
-    };
-  };
-};
-
-type SubjectLevels = {
-  [key: string]: number;
-};
-
 const data: WheelData = {
   MATH: {
     option: "MATH",
@@ -42,7 +20,25 @@ const data: WheelData = {
   },
 };
 
-const WheelSpinner: React.FC = () => {
+type WheelData = {
+  [key: string]: {
+    option: string;
+    style: {
+      backgroundColor: string;
+      textColor: string;
+    };
+  };
+};
+
+type SubjectLevels = {
+  [key: string]: number;
+};
+
+type Props = {
+  handleShowQuestion: () => void;
+};
+
+const WheelSpinner: React.FC<Props> = ({ handleShowQuestion }) => {
   const [subjectLevels, setSubjectLevels] = useState<SubjectLevels>({
     MATH: 1,
     SCIENCE: 1,
@@ -65,6 +61,7 @@ const WheelSpinner: React.FC = () => {
 
   const finishSpinning = () => {
     setStartSpinning(false);
+    console.log(winningPrize);
   };
 
   const addNewSubject = (newSubject: string) => {
@@ -132,6 +129,11 @@ const WheelSpinner: React.FC = () => {
               <button onClick={() => removeSubject(subject)}>-</button>
             </div>
           ))}
+      </div>
+      <div className="mt-6">
+        <button onClick={handleShowQuestion} className={btnClass}>
+          Show Question
+        </button>
       </div>
     </div>
   );

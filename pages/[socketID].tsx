@@ -38,8 +38,9 @@ const Room: NextPage = () => {
   const [users, setUsers] = useState<User[]>([]);
 
   const [isHost, setIsHost] = useState<boolean>(false);
+  const [showLobby, setShowLobby] = useState<boolean>(true);
   const [showSpinner, setShowSpinner] = useState<boolean>(false);
-  const [showQuestion, setShowQuestion] = useState<boolean>(true);
+  const [showQuestion, setShowQuestion] = useState<boolean>(false);
 
   useEffect((): any => {
     const socket = io({ path: "/api/socketio" });
@@ -125,8 +126,24 @@ const Room: NextPage = () => {
         message: "Attempting to start game",
       });
     } else {
-      console.log(`ERROR: socket not connected to make start game`);
+      console.log(`ERROR: socket not connected to start game`);
     }
+  };
+
+  const handleResetRoom = () => {
+    if (socket) {
+      socket.emit("restartGameRequest", {
+        id: hostID ? hostID : socket.id,
+        message: "Attempting to restart room",
+      });
+    } else {
+      console.log(`ERROR: socket not connected to restart game`);
+    }
+  };
+
+  const handleShowQuestion = () => {
+    setShowSpinner(false);
+    setShowQuestion(true);
   };
 
   return (
@@ -138,8 +155,10 @@ const Room: NextPage = () => {
         </Button>
         <Button onClick={handleStartGame}>Start Game</Button>
       </div>
-      {!showSpinner && <LobbyScreen socketID={socketID} users={users} />}
-      {showSpinner && <WheelSpinner />}
+      {showLobby && !showSpinner && !showQuestion && (
+        <LobbyScreen socketID={socketID} users={users} />
+      )}
+      {showSpinner && <WheelSpinner handleShowQuestion={handleShowQuestion} />}
       {showQuestion && <QuestionScreen currentQuestion={currentQuestion} />}
     </div>
   );
