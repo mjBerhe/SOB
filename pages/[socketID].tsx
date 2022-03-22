@@ -82,15 +82,24 @@ const Room: NextPage = () => {
         setUsers(data?.room?.users);
       });
 
-      socket.on("startGameResponse", (data: GameReponse) => {
+      socket.on("response:startGame", (data: GameReponse) => {
         if (data.status === true) {
           setShowSpinner(true);
         }
       });
 
-      socket.on("resetGameResponse", (data: GameReponse) => {
+      socket.on("response:resetGame", (data: GameReponse) => {
         if (data.status === true) {
-          handleResetRoom();
+          setShowSpinner(false);
+          setShowQuestion(false);
+          setShowLobby(true);
+        }
+      });
+
+      socket.on("response:nextQuestion", (data: GameReponse) => {
+        if (data.status === true) {
+          setShowSpinner(false);
+          setShowQuestion(true);
         }
       });
 
@@ -105,7 +114,7 @@ const Room: NextPage = () => {
   useEffect(() => {
     console.log(users);
     // sets isHost to true if the host just joined
-    if (socket) {
+    if (socket && users) {
       const hostIndex = users.findIndex((user) => user.isHost === true);
       if (hostIndex > -1) {
         if (users[hostIndex].id === socket.id) {
@@ -122,10 +131,9 @@ const Room: NextPage = () => {
     level: 1,
   });
 
-  // send a request to start the game
   const handleStartGame = () => {
     if (socket) {
-      socket.emit("startGameRequest", {
+      socket.emit("request:startGame", {
         id: hostID ? hostID : socket.id,
         room: socketID,
         message: "Attempting to start game",
@@ -135,15 +143,21 @@ const Room: NextPage = () => {
     }
   };
 
-  const handleResetRoom = () => {
-    setShowSpinner(false);
-    setShowQuestion(false);
-    setShowLobby(true);
+  const handleResetGame = () => {
+    if (socket) {
+      socket.emit("request:resetGame", {
+        id: hostID ? hostID : socket.id,
+        room: socketID,
+        message: "Attempting to reset game",
+      });
+    } else {
+      console.log("[ERROR]: socket not connected");
+    }
   };
 
-  const handleShowQuestion = () => {
+  const handleNextQuestion = () => {
     if (socket) {
-      socket.emit("showNextQuestion", {
+      socket.emit("request:nextQuestion", {
         id: hostID ? hostID : socket.id,
         room: socketID,
         message: "Attempting to show next question",
@@ -161,11 +175,12 @@ const Room: NextPage = () => {
           Show Spinner
         </Button>
         <Button onClick={handleStartGame}>Start Game</Button>
+        <Button onClick={handleResetGame}>Reset Game</Button>
       </div>
       {showLobby && !showSpinner && !showQuestion && (
         <LobbyScreen socketID={socketID} users={users} />
       )}
-      {showSpinner && <WheelSpinner handleShowQuestion={handleShowQuestion} />}
+      {showSpinner && <WheelSpinner handleNextQuestion={handleNextQuestion} />}
       {showQuestion && <QuestionScreen currentQuestion={currentQuestion} />}
     </div>
   );

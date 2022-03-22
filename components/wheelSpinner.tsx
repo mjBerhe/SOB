@@ -35,10 +35,10 @@ type SubjectLevels = {
 };
 
 type Props = {
-  handleShowQuestion: () => void;
+  handleNextQuestion: () => void;
 };
 
-const WheelSpinner: React.FC<Props> = ({ handleShowQuestion }) => {
+const WheelSpinner: React.FC<Props> = ({ handleNextQuestion }) => {
   const [subjectLevels, setSubjectLevels] = useState<SubjectLevels>({
     MATH: 1,
     SCIENCE: 1,
@@ -131,8 +131,8 @@ const WheelSpinner: React.FC<Props> = ({ handleShowQuestion }) => {
           ))}
       </div>
       <div className="mt-6">
-        <button onClick={handleShowQuestion} className={btnClass}>
-          Show Question
+        <button onClick={handleNextQuestion} className={btnClass}>
+          Go to Question
         </button>
       </div>
     </div>

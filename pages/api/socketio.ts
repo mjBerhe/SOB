@@ -7,6 +7,7 @@ import { addUser, removeUser, findRoom } from "../../utils/socketio/users";
 import {
   startGameHandler,
   resetGameHandler,
+  nextQuestionHandler,
 } from "../../utils/eventHandlers/startGameRequest";
 import { User, Room } from "../../types/LobbyTypes";
 
@@ -71,6 +72,7 @@ const socketHandler = (req: NextApiRequest, res: NextApiResponseServerIO) => {
 
       startGameHandler(io, socket, hostID);
       resetGameHandler(io, socket, hostID);
+      nextQuestionHandler(io, socket, hostID);
 
       socket.on("hostJoin", (data: userJoinData) => {
         const user: User = {

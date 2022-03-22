@@ -9,27 +9,37 @@ type gameRequestData = {
 const startGameHandler = (io: Server, socket: Socket, hostID: string) => {
   const startGameRequest = (data: gameRequestData) => {
     if (data.id === hostID) {
-      io.to(data.room).emit("startGameResponse", {
+      io.to(data.room).emit("response:startGame", {
         status: true,
       });
     }
   };
 
-  socket.on("startGameRequest", startGameRequest);
+  socket.on("request:startGame", startGameRequest);
 };
 
 const resetGameHandler = (io: Server, socket: Socket, hostID: string) => {
   const resetGameRequest = (data: gameRequestData) => {
     if (data.id === hostID) {
-      io.to(data.room).emit("resetGameResponse", {
+      io.to(data.room).emit("response:resetGame", {
         status: true,
       });
     }
   };
 
-  socket.on("resetGameRequest", resetGameRequest);
+  socket.on("request:resetGame", resetGameRequest);
 };
 
-const showQuestionHandler = () => {};
+const nextQuestionHandler = (io: Server, socket: Socket, hostID: string) => {
+  const nextQuestionRequest = (data: gameRequestData) => {
+    if (data.id === hostID) {
+      io.to(data.room).emit("response:nextQuestion", {
+        status: true,
+      });
+    }
+  };
 
-export { startGameHandler, resetGameHandler };
+  socket.on("request:nextQuestion", nextQuestionRequest);
+};
+
+export { startGameHandler, resetGameHandler, nextQuestionHandler };
