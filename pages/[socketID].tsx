@@ -25,7 +25,7 @@ type Question = {
   level: number;
 };
 
-type StartGameReponse = {
+type GameReponse = {
   status: boolean;
 };
 
@@ -82,11 +82,15 @@ const Room: NextPage = () => {
         setUsers(data?.room?.users);
       });
 
-      socket.on("startGameResponse", (data: StartGameReponse) => {
+      socket.on("startGameResponse", (data: GameReponse) => {
         if (data.status === true) {
           setShowSpinner(true);
-        } else {
-          console.log(data);
+        }
+      });
+
+      socket.on("resetGameResponse", (data: GameReponse) => {
+        if (data.status === true) {
+          handleResetRoom();
         }
       });
 
@@ -123,27 +127,30 @@ const Room: NextPage = () => {
     if (socket) {
       socket.emit("startGameRequest", {
         id: hostID ? hostID : socket.id,
+        room: socketID,
         message: "Attempting to start game",
       });
     } else {
-      console.log(`ERROR: socket not connected to start game`);
+      console.log("[ERROR]: socket not connected");
     }
   };
 
   const handleResetRoom = () => {
-    if (socket) {
-      socket.emit("restartGameRequest", {
-        id: hostID ? hostID : socket.id,
-        message: "Attempting to restart room",
-      });
-    } else {
-      console.log(`ERROR: socket not connected to restart game`);
-    }
+    setShowSpinner(false);
+    setShowQuestion(false);
+    setShowLobby(true);
   };
 
   const handleShowQuestion = () => {
-    setShowSpinner(false);
-    setShowQuestion(true);
+    if (socket) {
+      socket.emit("showNextQuestion", {
+        id: hostID ? hostID : socket.id,
+        room: socketID,
+        message: "Attempting to show next question",
+      });
+    } else {
+      console.log("[ERROR]: socket not connected");
+    }
   };
 
   return (
